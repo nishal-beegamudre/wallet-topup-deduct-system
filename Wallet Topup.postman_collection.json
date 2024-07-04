@@ -1,0 +1,3075 @@
+{
+	"info": {
+		"_postman_id": "defc9289-830e-4d17-a224-6e4d474c476f",
+		"name": "Wallet Topup",
+		"description": "This is the implementation of online wallet payment system where topup and deduction transactions will be done. The solution has been implemented using Java - Spring Boot. The data modeling consists of a user table and a transaction table. User table contains the wallet balance which keeps getting updated on every topup/deduct API request. Each topup/deduct API request is captured as a transaction which stores the details of the transaction like balance, user ID, status etc.\n\n**Features:**\n\n1. Java-Spring Boot has been used for the implementation.\n    \n2. It provides authentication using JWT token.\n    \n3. It allows asynchronous (concurrent) transactions via multithreading and allows upto 200 threads at a time + 100 requests in queue.\n    \n4. Caching is enabled for all the methods including query, insert and update.\n    \n5. REST APIs are used for all the operations.\n    \n6. MySQL database has been used.\n    \n7. Simple Logging Facade (slf4j) is the framework used for logging.\n    \n8. Spring Boot Test (JUnit) has been used for unit test cases.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18403833"
+	},
+	"item": [
+		{
+			"name": "Login/Signup",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"abcdsample@gmail.com\",\r\n    \"password\":\"password123\",\r\n    \"name\":\"Test Sample\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8083/auth/signup",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"auth",
+								"signup"
+							]
+						},
+						"description": "This API is used to register a user. It creates a user entry in the database. This API does not require any authentication.\n\n**Required request parameters:**\n\n1. email (required) - String - this is a mandatory field which need to be an email ID.\n    \n2. password (required) - String - this is the password field which will be saved in an encoded format in the database.\n    \n3. name (required) - String - this is the name field which indicates the full name of the user\n    \n\n**Response parameters:**\n\n1. user_id - Long - It gives the user ID if the user is created successfully. It will be null otherwise.\n    \n2. name - String - It gives the name of the user that was given as input if the user is created successfully. It will be null otherwise.\n    \n3. balance - Float - It gives the balance amount of that user. By default, it will be 0.\n    \n4. email - String - It gives the email ID that was given as input if the user is created successfully. It will be null otherwise.\n    \n5. password - String - It will always be null. This field is created in the DTO just for the future scope purposes.\n    \n6. createdDate - String - It gives the timestamp in IST in case of successful user creation. It will be null otherwise.\n    \n7. lastModifiedDate - String - It gives the last modified timestamp in IST in case of successful user creation. It will be null otherwise.\n    \n8. message - String - If the user creation is not successful due to any reasons, this field shows the reason. It will be null if the user is created successful.\n    \n\n**Data validations:**\n\n1. It validates if the email ID is having '@' and '.com'. It throws invalid request body message if the string is not containing these two parameters.\n    \n2. It validates if all 3 required input parameters are there or not. It throws invalid request body message otherwise.\n    \n3. It checks if a user entry exists with the given email ID already. If yes, it throws a message and does not create a new entry."
+					},
+					"response": [
+						{
+							"name": "Happy Scenario",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"abcdsample2@gmail.com\",\r\n    \"password\": \"password123\",\r\n    \"name\": \"Test Sample\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/auth/signup",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:03:24 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"user_id\": 202,\n    \"name\": \"Test Sample\",\n    \"balance\": 0,\n    \"email\": \"abcdsample2@gmail.com\",\n    \"password\": null,\n    \"createdDate\": \"2024-07-04T12:33:24.7498634+05:30\",\n    \"lastModifiedDate\": \"2024-07-04T12:33:24.7498634+05:30\",\n    \"message\": null\n}"
+						},
+						{
+							"name": "User Exists Already",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\":\"testsample@gmail.com\",\r\n    \"password\":\"password123\",\r\n    \"name\":\"Test Sample\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/auth/signup",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:07:16 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"user_id\": null,\n    \"name\": null,\n    \"balance\": 0,\n    \"email\": null,\n    \"password\": null,\n    \"createdDate\": null,\n    \"lastModifiedDate\": null,\n    \"message\": \"A user exists with this email ID already\"\n}"
+						},
+						{
+							"name": "Invalid Request Body",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\":\"abcdsample2@gmail.com\",\r\n    \"name\":\"Test Sample\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/auth/signup",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:39:09 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"user_id\": null,\n    \"name\": null,\n    \"balance\": 0,\n    \"email\": null,\n    \"password\": null,\n    \"createdDate\": null,\n    \"lastModifiedDate\": null,\n    \"message\": \"Invalid request body\"\n}"
+						},
+						{
+							"name": "Invalid Email ID",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\":\"abcdsample2\",\r\n    \"password\":\"password123\",\r\n    \"name\":\"Test Sample\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/auth/signup",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:39:42 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"user_id\": null,\n    \"name\": null,\n    \"balance\": 0,\n    \"email\": null,\n    \"password\": null,\n    \"createdDate\": null,\n    \"lastModifiedDate\": null,\n    \"message\": \"Invalid request body\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"abcdsample1@gmail.com\",\r\n    \"password\":\"password123\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8083/auth/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "This API is used to login a user. It validates the user name and password. It generates and gives a JWT Token in case of successful authentication. This API does not require any authentication.\n\n**Required request parameters:**\n\n1. email (required) - String - this is a mandatory field which need to be an email ID.\n    \n2. password (required) - String - this is the password field.\n    \n\n**Response parameters:**\n\n1. token - String - This is the JWT Token that is generated in case of successful authentication. This JWT token needs to be added as bearer token in all other APIs as part of authentication.\n    \n2. expiresIn - Long - It is in milliseconds. The given JWT token expires after those many milli seconds. By default, it is set to 1 hour which is 3600000 milliseconds.\n    \n3. message - String - If gives the message on whether the authentication is successful or not.\n    \n\n**Data validations:**\n\n1. It validates if all 2 required input parameters are there or not. It throws invalid request body message otherwise."
+					},
+					"response": [
+						{
+							"name": "Happy Scenario",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\":\"abcdsample1@gmail.com\",\r\n    \"password\":\"password123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/auth/login",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:40:59 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYmNkc2FtcGxlMUBnbWFpbC5jb20iLCJpYXQiOjE3MjAwNzg4NTksImV4cCI6MTcyMDA4MjQ1OX0.phzP18tjaAuXYgl6sfE5Bq7Ces6ujYyR9NQdoMHcrm8\",\n    \"expiresIn\": 3600000,\n    \"message\": \"Authentication has been successful\"\n}"
+						},
+						{
+							"name": "Invalid credentials",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\":\"abcdsample1@gmail.com\",\r\n    \"password\":\"password1234\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/auth/login",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:41:22 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Unauthorized\",\n    \"status\": 401,\n    \"detail\": \"Bad credentials\",\n    \"instance\": \"/auth/login\",\n    \"description\": \"The username or password is incorrect\"\n}"
+						},
+						{
+							"name": "Invalid Request Body",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\":\"abcdsample1@gmail.com\"\r\n\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/auth/login",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:41:58 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token\": null,\n    \"expiresIn\": 0,\n    \"message\": \"Invalid request body\"\n}"
+						}
+					]
+				}
+			],
+			"description": "This folder contains 2 APIs. One for registering the user and One for logging in. Login API gives JWT token that can be used to authenticate other APIs."
+		},
+		{
+			"name": "Wallet APIs",
+			"item": [
+				{
+					"name": "Get User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYmNkc2FtcGxlMUBnbWFpbC5jb20iLCJpYXQiOjE3MjAwNzg4NTksImV4cCI6MTcyMDA4MjQ1OX0.phzP18tjaAuXYgl6sfE5Bq7Ces6ujYyR9NQdoMHcrm8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8083/getUser/102",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"getUser",
+								"102"
+							]
+						},
+						"description": "This API gives the details of the user by taking the user ID as an input path variable.\n\n**Input Path Variable:**\n\n1. input path variable (required) - A valid user ID needs to be provided as the path variable.\n    \n\n**Authentication:**\n\nBearer token - Use the JWT token that is obtained after hitting login API.\n\n**Response parameters:**\n\n1. user_id - Long - It gives the user ID.\n    \n2. name - String - It gives the name of the user.\n    \n3. balance - Float - It gives the balance amount of that user.\n    \n4. email - String - It gives the email ID of the user.\n    \n5. password - String - It will always be null. This field is created in the DTO just for the future scope purposes.\n    \n6. createdDate - String - It gives the timestamp in IST at which the user was created.\n    \n7. lastModifiedDate - String - It gives the last modified timestamp in IST at which some modification was done for that user entry.\n    \n8. message - String - If user ID is invalid, it gives the respective message.\n    \n\n**Data Validation:**\n\n1. It checks if the path variable is having a valid number or not.\n    \n2. It checks if JWT token is provided as part of authentication or not. Throws 403 error if not given.\n    \n3. It checks if the JWT token is valid or not. Throws respective message if it is invalid or expired."
+					},
+					"response": [
+						{
+							"name": "Happy Scenario",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getUser/102",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getUser",
+										"102"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:48:31 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"user_id\": 102,\n    \"name\": \"Test Sample\",\n    \"balance\": 1005,\n    \"email\": \"abcdsample@gmail.com\",\n    \"password\": null,\n    \"createdDate\": \"2024-07-03T23:14:28.066309+05:30\",\n    \"lastModifiedDate\": \"2024-07-04T12:34:19.760978+05:30\",\n    \"message\": null\n}"
+						},
+						{
+							"name": "No Authentication",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getUser/102",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getUser",
+										"102"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:43:24 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Invalid JWT Token",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getUser/102",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getUser",
+										"102"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:44:03 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.\",\n    \"instance\": \"/getUser/102\",\n    \"description\": \"The JWT signature is invalid\"\n}"
+						},
+						{
+							"name": "Token Expired",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getUser/102",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getUser",
+										"102"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 09:20:35 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT expired at 2024-07-04T08:40:59Z. Current time: 2024-07-04T09:20:35Z, a difference of 2376468 milliseconds.  Allowed clock skew: 0 milliseconds.\",\n    \"instance\": \"/getUser/102\",\n    \"description\": \"The JWT token has expired\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYmNkc2FtcGxlMUBnbWFpbC5jb20iLCJpYXQiOjE3MjAwNzY0MTksImV4cCI6MTcyMDA4MDAxOX0.T2yBXbntk8bvnhABwQ6GnSN-9a0UY9J99Gt7dwywdAs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8083/getAllUsers",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"getAllUsers"
+							]
+						},
+						"description": "This API gives the all the users available in the database.\n\n**Authentication:**\n\nBearer token - Use the JWT token that is obtained after hitting login API.\n\n**Response parameters:**\n\nResponse will be an array of objects. Each object will have the below mentioned parameters.\n\n1. user_id - Long - It gives the user ID.\n    \n2. name - String - It gives the name of the user.\n    \n3. balance - Float - It gives the balance amount of that user.\n    \n4. email - String - It gives the email ID of the user.\n    \n5. password - String - It will always be null. This field is created in the DTO just for the future scope purposes.\n    \n6. createdDate - String - It gives the timestamp in IST at which the user was created.\n    \n7. lastModifiedDate - String - It gives the last modified timestamp in IST at which some modification was done for that user entry.\n    \n8. message - String - If user ID is invalid, it gives the respective message.\n    \n\n**Data Validation:**\n\n1. It checks if JWT token is provided as part of authentication or not. Throws 403 error if not given.\n    \n2. It checks if the JWT token is valid or not. Throws respective message if it is invalid or expired."
+					},
+					"response": [
+						{
+							"name": "Happy Scenario",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getAllUsers",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getAllUsers"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:51:08 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"user_id\": 102,\n        \"name\": \"Test Sample\",\n        \"balance\": 1005,\n        \"email\": \"abcdsample@gmail.com\",\n        \"password\": null,\n        \"createdDate\": \"2024-07-03T23:14:28.066309+05:30\",\n        \"lastModifiedDate\": \"2024-07-04T12:34:19.760978+05:30\",\n        \"message\": null\n    },\n    {\n        \"user_id\": 152,\n        \"name\": \"Test Sample\",\n        \"balance\": 0,\n        \"email\": \"abcdsample1@gmail.com\",\n        \"password\": null,\n        \"createdDate\": \"2024-07-04T00:48:52.776984+05:30\",\n        \"lastModifiedDate\": \"2024-07-04T00:48:52.776984+05:30\",\n        \"message\": null\n    },\n    {\n        \"user_id\": 202,\n        \"name\": \"Test Sample\",\n        \"balance\": 0,\n        \"email\": \"abcdsample2@gmail.com\",\n        \"password\": null,\n        \"createdDate\": \"2024-07-04T12:33:24.749863+05:30\",\n        \"lastModifiedDate\": \"2024-07-04T12:33:24.749863+05:30\",\n        \"message\": null\n    }\n]"
+						},
+						{
+							"name": "No Authentication",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getAllUsers",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getAllUsers"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:51:37 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Invalid JWT Token",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getAllUsers",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getAllUsers"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:51:54 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.\",\n    \"instance\": \"/getAllUsers\",\n    \"description\": \"The JWT signature is invalid\"\n}"
+						},
+						{
+							"name": "Token Expired",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getAllUsers",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getAllUsers"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 09:20:54 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT expired at 2024-07-04T08:00:19Z. Current time: 2024-07-04T09:20:54Z, a difference of 4835491 milliseconds.  Allowed clock skew: 0 milliseconds.\",\n    \"instance\": \"/getAllUsers\",\n    \"description\": \"The JWT token has expired\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Topup",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYmNkc2FtcGxlMUBnbWFpbC5jb20iLCJpYXQiOjE3MjAwNzg4NTksImV4cCI6MTcyMDA4MjQ1OX0.phzP18tjaAuXYgl6sfE5Bq7Ces6ujYyR9NQdoMHcrm8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\":\"102\",\r\n    \"amount\":2001.00\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8083/topup",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"topup"
+							]
+						},
+						"description": "This API adds the specified amount to the existing wallet balance of the user whose user ID is given as the input. It creates a transaction entry which is linked to the given user ID and adds the given amount.\n\n**Request parameters:**\n\n1. user_id (required) - String - the user ID whose balance needs to be updated.\n    \n2. amount (required) - String - the amount which needs to be added to the existing balance\n    \n\n**Authentication:**\n\nBearer token - Use the JWT token that is obtained after hitting login API.\n\n**Response parameters:**\n\n1. transaction_id - String - A transaction is created and that ID is given.\n    \n2. new_balance - Float - New updated balance after adding the topup amount\n    \n3. status - Boolean - true if the transaction is successful, false otherwise\n    \n4. message - String - gives the status message.\n    \n\n**Data Validation:**\n\n1. It checks if required input parameters are given or not. Throws invalid request body message.\n    \n2. It also checks if the given user ID and amount is numerical or not. Throws invalid request body message.\n    \n3. It fetches the user from the user ID and throws invalid user message if the user ID is invalid.\n    \n4. It checks if the amount given is zero or positive number. Throws a message if it is not.\n    \n5. It checks if JWT token is provided as part of authentication or not. Throws 403 error if not given.\n    \n6. It checks if the JWT token is valid or not. Throws respective message if it is invalid or expired."
+					},
+					"response": [
+						{
+							"name": "Happy Scenario",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"102\",\r\n    \"amount\":2001.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/topup",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"topup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:54:04 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": true,\n    \"new_balance\": 3006,\n    \"transaction_id\": \"452\",\n    \"message\": \"Transaction is successful\"\n}"
+						},
+						{
+							"name": "Invalid User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"1020\",\r\n    \"amount\":2001.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/topup",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"topup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:54:34 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": false,\n    \"new_balance\": 0,\n    \"transaction_id\": null,\n    \"message\": \"Invalid user\"\n}"
+						},
+						{
+							"name": "Invalid Request Body",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"1dsgd02\",\r\n    \"amount\":\"2001.00\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/topup",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"topup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:55:40 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": false,\n    \"new_balance\": 0,\n    \"transaction_id\": null,\n    \"message\": \"Invalid request body\"\n}"
+						},
+						{
+							"name": "No Authentication",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"102\",\r\n    \"amount\":2001.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/topup",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"topup"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:01:52 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Invalid JWT Token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"102\",\r\n    \"amount\":2001.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/topup",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"topup"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:03:05 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.\",\n    \"instance\": \"/topup\",\n    \"description\": \"The JWT signature is invalid\"\n}"
+						},
+						{
+							"name": "Token Expired",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"102\",\r\n    \"amount\":2001.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/topup",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"topup"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 09:21:12 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT expired at 2024-07-04T08:40:59Z. Current time: 2024-07-04T09:21:12Z, a difference of 2413266 milliseconds.  Allowed clock skew: 0 milliseconds.\",\n    \"instance\": \"/topup\",\n    \"description\": \"The JWT token has expired\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Deduct",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYmNkc2FtcGxlMUBnbWFpbC5jb20iLCJpYXQiOjE3MjAwNzg4NTksImV4cCI6MTcyMDA4MjQ1OX0.phzP18tjaAuXYgl6sfE5Bq7Ces6ujYyR9NQdoMHcrm8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\":\"1020\",\r\n    \"amount\":2000.00\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8083/deduct",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"deduct"
+							]
+						},
+						"description": "This API deducts the specified amount from the existing wallet balance of the user whose user ID is given as the input. It creates a transaction entry which is linked to the given user ID and deducts the given amount.\n\n**Request parameters:**\n\n1. user_id (required) - String - the user ID whose balance needs to be updated.\n    \n2. amount (required) - String - the amount which needs to be deducted from the existing balance\n    \n\n**Authentication:**\n\nBearer token - Use the JWT token that is obtained after hitting login API.\n\n**Response parameters:**\n\n1. transaction_id - String - A transaction is created and that ID is given.\n    \n2. new_balance - Float - New updated balance after deducting the amount\n    \n3. status - Boolean - true if the transaction is successful, false otherwise\n    \n4. message - String - gives the status message.\n    \n\n**Data Validation:**\n\n1. It checks if required input parameters are given or not. Throws invalid request body message.\n    \n2. It also checks if the given user ID and amount is numerical or not. Throws invalid request body message.\n    \n3. It fetches the user from the user ID and throws invalid user message if the user ID is invalid.\n    \n4. It checks if the amount given is zero or positive number. Throws a message if it is not.\n    \n5. It checks if the user's wallet balance has the amount more than the given input amount or not. If not, it throws a message that the balance is not enough.\n    \n6. It checks if JWT token is provided as part of authentication or not. Throws 403 error if not given.\n    \n7. It checks if the JWT token is valid or not. Throws respective message if it is invalid or expired."
+					},
+					"response": [
+						{
+							"name": "Happy Scenario",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"102\",\r\n    \"amount\":1000.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/deduct",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"deduct"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:57:28 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": true,\n    \"new_balance\": 4007,\n    \"transaction_id\": \"455\",\n    \"message\": \"Transaction is successful\"\n}"
+						},
+						{
+							"name": "Not Enough Balance",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"102\",\r\n    \"amount\":6000.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/deduct",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"deduct"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:57:51 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": false,\n    \"new_balance\": 0,\n    \"transaction_id\": null,\n    \"message\": \"Not enough balance to deduct this amount\"\n}"
+						},
+						{
+							"name": "Invalid Request Body",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"1dff02\",\r\n    \"amount\":6000.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/deduct",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"deduct"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:58:20 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": false,\n    \"new_balance\": 0,\n    \"transaction_id\": null,\n    \"message\": \"Invalid request body\"\n}"
+						},
+						{
+							"name": "Invalid User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"1020\",\r\n    \"amount\":6000.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/deduct",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"deduct"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:58:36 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": false,\n    \"new_balance\": 0,\n    \"transaction_id\": null,\n    \"message\": \"Invalid user\"\n}"
+						},
+						{
+							"name": "No Authentication",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"1020\",\r\n    \"amount\":2000.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/deduct",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"deduct"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:02:10 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Invalid JWT Token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"1020\",\r\n    \"amount\":2000.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/deduct",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"deduct"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:03:55 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.\",\n    \"instance\": \"/deduct\",\n    \"description\": \"The JWT signature is invalid\"\n}"
+						},
+						{
+							"name": "Token Expired",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\":\"1020\",\r\n    \"amount\":2000.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8083/deduct",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"deduct"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 09:21:30 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT expired at 2024-07-04T08:40:59Z. Current time: 2024-07-04T09:21:30Z, a difference of 2431021 milliseconds.  Allowed clock skew: 0 milliseconds.\",\n    \"instance\": \"/deduct\",\n    \"description\": \"The JWT token has expired\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Balance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYmNkc2FtcGxlMUBnbWFpbC5jb20iLCJpYXQiOjE3MjAwNzg4NTksImV4cCI6MTcyMDA4MjQ1OX0.phzP18tjaAuXYgl6sfE5Bq7Ces6ujYyR9NQdoMHcrm8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8083/balance?user_id=102",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"balance"
+							],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "102"
+								}
+							]
+						},
+						"description": "This API fetches the existing balance amount linked with the given input user ID.\n\n**Request GET parameters:**\n\n1. user_id (required) - String - the user ID whose balance needs to be fetched.\n    \n\n**Authentication:**\n\nBearer token - Use the JWT token that is obtained after hitting login API.\n\n**Response parameters:**\n\n1. balance - Float - Balance amount of the given user ID\n    \n2. message - String - Status of the request\n    \n\n**Data Validation:**\n\n1. It checks if the given user ID is numerical or not. Throws invalid request body message.\n    \n2. It fetches the user from the user ID and throws invalid user message if the user ID is invalid.\n    \n3. It checks if JWT token is provided as part of authentication or not. Throws 403 error if not given.\n    \n4. It checks if the JWT token is valid or not. Throws respective message if it is invalid or expired."
+					},
+					"response": [
+						{
+							"name": "Happy Scenario",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/balance?user_id=102",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"balance"
+									],
+									"query": [
+										{
+											"key": "user_id",
+											"value": "102"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 07:59:40 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"balance\": 4007,\n    \"message\": \"Balance fetched successfully\"\n}"
+						},
+						{
+							"name": "Invalid User ID",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/balance?user_id=1020",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"balance"
+									],
+									"query": [
+										{
+											"key": "user_id",
+											"value": "1020"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:00:14 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"balance\": 0,\n    \"message\": \"Invalid user ID\"\n}"
+						},
+						{
+							"name": "No Authentication",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/balance?user_id=1020",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"balance"
+									],
+									"query": [
+										{
+											"key": "user_id",
+											"value": "1020"
+										}
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:02:28 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Invalid JWT Token",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/balance?user_id=1020",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"balance"
+									],
+									"query": [
+										{
+											"key": "user_id",
+											"value": "1020"
+										}
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:04:24 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.\",\n    \"instance\": \"/balance\",\n    \"description\": \"The JWT signature is invalid\"\n}"
+						},
+						{
+							"name": "Token Expired",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/balance?user_id=102",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"balance"
+									],
+									"query": [
+										{
+											"key": "user_id",
+											"value": "102"
+										}
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 09:21:43 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT expired at 2024-07-04T08:40:59Z. Current time: 2024-07-04T09:21:43Z, a difference of 2444922 milliseconds.  Allowed clock skew: 0 milliseconds.\",\n    \"instance\": \"/balance\",\n    \"description\": \"The JWT token has expired\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Transaction Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYmNkc2FtcGxlMUBnbWFpbC5jb20iLCJpYXQiOjE3MjAwNzg4NTksImV4cCI6MTcyMDA4MjQ1OX0.phzP18tjaAuXYgl6sfE5Bq7Ces6ujYyR9NQdoMHcrm8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8083/getTransactionDetails/455",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"getTransactionDetails",
+								"455"
+							]
+						},
+						"description": "This API fetches the details of the transaction whose transaction ID is given.\n\n**Request path variable:**\n\n1. transaction ID (required) - transaction ID whose transaction details need to be fetched.\n    \n\n**Authentication:**\n\nBearer token - Use the JWT token that is obtained after hitting login API.\n\n**Response parameters:**\n\n1. transaction_id - Long - ID of the given transaction ID\n    \n2. amount - Float - amount that was specified as input for the topup/deduction.\n    \n3. new_balance - Float - the updated balance amount in the user's wallet after the transaction was completed\n    \n4. status - Boolean - it will be true if the transaction is successful. False otherwise\n    \n5. user_id - String - the ID of the user whose wallet was updated\n    \n6. transaction_type - Enum - gives enum values TOPUP/DEDUCT\n    \n7. transaction_date - Gives the timestamp of the transaction in IST\n    \n8. message - Gives the status message for this transaction. It will be null if the transaction is fetched successfully.\n    \n\n**Data Validation:**\n\n1. It checks if the given transaction ID is null or not. Throws invalid request body message if it is null.\n    \n2. It fetches the transaction from the user ID and throws invalid transaction ID message if the transaction ID is invalid.\n    \n3. It checks if JWT token is provided as part of authentication or not. Throws 403 error if not given.\n    \n4. It checks if the JWT token is valid or not. Throws respective message if it is invalid or expired."
+					},
+					"response": [
+						{
+							"name": "Happy Scenario",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getTransactionDetails/455",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getTransactionDetails",
+										"455"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:00:54 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"transaction_id\": 455,\n    \"amount\": 1000,\n    \"status\": true,\n    \"user_id\": \"102\",\n    \"new_balance\": 4007,\n    \"transaction_type\": \"DEDUCT\",\n    \"transaction_date\": \"2024-07-04T13:27:28.741914+05:30\",\n    \"message\": null\n}"
+						},
+						{
+							"name": "Invalid Transaction ID",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getTransactionDetails/4550",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getTransactionDetails",
+										"4550"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:01:19 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"transaction_id\": null,\n    \"amount\": 0,\n    \"status\": null,\n    \"user_id\": null,\n    \"new_balance\": 0,\n    \"transaction_type\": null,\n    \"transaction_date\": null,\n    \"message\": \"Invalid transaction ID\"\n}"
+						},
+						{
+							"name": "No Authentication",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getTransactionDetails/4550",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getTransactionDetails",
+										"4550"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:02:42 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Invalid JWT Token",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getTransactionDetails/455",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getTransactionDetails",
+										"455"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 08:05:07 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.\",\n    \"instance\": \"/getTransactionDetails/455\",\n    \"description\": \"The JWT signature is invalid\"\n}"
+						},
+						{
+							"name": "Token Expired",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8083/getTransactionDetails/455",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"getTransactionDetails",
+										"455"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Jul 2024 09:21:58 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Forbidden\",\n    \"status\": 403,\n    \"detail\": \"JWT expired at 2024-07-04T08:40:59Z. Current time: 2024-07-04T09:21:58Z, a difference of 2459486 milliseconds.  Allowed clock skew: 0 milliseconds.\",\n    \"instance\": \"/getTransactionDetails/455\",\n    \"description\": \"The JWT token has expired\"\n}"
+						}
+					]
+				}
+			],
+			"description": "These are the APIs which require authentication in the form of JWT token. Token needs to be generated by hitting Login User API. The token will be active for 1 hour."
+		}
+	]
+}
